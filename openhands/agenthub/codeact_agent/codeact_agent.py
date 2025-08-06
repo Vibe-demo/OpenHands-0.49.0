@@ -91,7 +91,7 @@ class CodeActAgent(Agent):
         self.conversation_memory = ConversationMemory(self.config, self.prompt_manager)
 
         self.condenser = Condenser.from_config(self.config.condenser)
-        logger.debug(f'Using condenser: {type(self.condenser)}')
+        logger.debug(f'[CodeAct Agent] - Using condenser: {type(self.condenser)}')
 
     @property
     def prompt_manager(self) -> PromptManager:
@@ -184,7 +184,7 @@ class CodeActAgent(Agent):
                 return condensation_action
 
         logger.debug(
-            f'Processing {len(condensed_history)} events from a total of {len(state.history)} events'
+            f'[CodeAct Agent] - Processing {len(condensed_history)} events from a total of {len(state.history)} events'
         )
 
         initial_user_message = self._get_initial_user_message(state.history)
@@ -194,10 +194,11 @@ class CodeActAgent(Agent):
         }
         params['tools'] = check_tools(self.tools, self.llm.config)
         params['extra_body'] = {'metadata': state.to_llm_metadata(agent_name=self.name)}
+        logger.debug(f'[CodeAct Agent] - Send LLM Message: {params}')
         response = self.llm.completion(**params)
-        logger.debug(f'Response from LLM: {response}')
+        logger.debug(f'[CodeAct Agent] - Response from LLM: {response}')
         actions = self.response_to_actions(response)
-        logger.debug(f'Actions after response_to_actions: {actions}')
+        logger.debug(f'[CodeAct Agent] - Actions after response_to_actions: {actions}')
         for action in actions:
             self.pending_actions.append(action)
         return self.pending_actions.popleft()
@@ -213,7 +214,7 @@ class CodeActAgent(Agent):
         if initial_user_message is None:
             # This should not happen in a valid conversation
             logger.error(
-                f'CRITICAL: Could not find the initial user MessageAction in the full {len(history)} events history.'
+                f'[CodeAct Agent] - CRITICAL: Could not find the initial user MessageAction in the full {len(history)} events history.'
             )
             # Depending on desired robustness, could raise error or create a dummy action
             # and log the error

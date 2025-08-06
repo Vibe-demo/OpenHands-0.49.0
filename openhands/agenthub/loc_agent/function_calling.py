@@ -52,7 +52,7 @@ def response_to_actions(
         # Process each tool call to OpenHands action
         for i, tool_call in enumerate(assistant_msg.tool_calls):
             action: Action
-            logger.debug(f'Tool call in function_calling.py: {tool_call}')
+            logger.debug(f'[Loc Agent] - Tool call in function_calling.py: {tool_call}')
             try:
                 arguments = json.loads(tool_call.function.arguments)
             except json.decoder.JSONDecodeError as e:
@@ -71,7 +71,7 @@ def response_to_actions(
             if tool_call.function.name in ALL_FUNCTIONS:
                 # We implement this in agent_skills, which can be used via Jupyter
                 func_name = tool_call.function.name
-                code = f'print({func_name}(**{arguments}))'
+                code = f'[Loc Agent] - print({func_name}(**{arguments}))'
                 logger.debug(f'TOOL CALL: {func_name} with code: {code}')
                 action = IPythonRunCellAction(code=code)
 
